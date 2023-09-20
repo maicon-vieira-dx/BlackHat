@@ -2,7 +2,7 @@ import socket
 import argparse
 import sys
 import textwrap
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Event
 def connect_server(host, port, verbose):
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -12,7 +12,6 @@ def connect_server(host, port, verbose):
         return f"[ABERTA]: {port}"
     elif verbose:
         return f"[FECHADA]: {port}"
-
 
 class PortScanner:
 
@@ -38,15 +37,20 @@ class PortScanner:
             count += 1
 
     def scan(self):
-        event = Event()
-        with ThreadPoolExecutor(int(self.threads)) as executor:
-            for port in self.ports:
-                    result = executor.submit(connect_server, self.target, int(port), self.verbose)
-                try
-                except KeyboardInterrupt:
-                    print('Sessão finalizada')
-                    event.set()
-                    sys.exit()
+        with ThreadPoolExecutor(max_workers=int(self.threads)) as executor:
+            futures = [executor.submit(connect_server, self.target, int(port), self.verbose) for port in self.ports]
+
+            try:
+                for future in as_completed(futures):
+                    result = future.result()
+                    if result:
+                        print(result)
+                    future.cancel()
+            except KeyboardInterrupt:
+                print('Sessão finalizada')
+                sys.exit()
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
@@ -62,7 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--port', help="Portas do alvo")
     parser.add_argument('-l', '--list', help='Lista de portas para inspecionar')
     parser.add_argument('-r', '--range', help='Inserir máximo e mínimo de portas para escanear')
-    parser.add_argument('-v', '--verbose', default=False, help='Visualizar todas as informações')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Visualizar todas as informações')
     parser.add_argument('-T', '--threads', default=30, help='Quantidade de threads para serem executadas simultaneamente')
     args = parser.parse_args()
     portSc = PortScanner(args)
