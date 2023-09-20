@@ -46,12 +46,12 @@ class FtpBrute:
             connectFTP(self.target, self.login, self.password)
         elif self.args.loginWordlist:
             for login in login_list:
-            	login = login.strip()
-            	executor.submit(connectFTP, self.target, login, self.password)
+                login = login.strip()
+                executor.submit(connectFTP, self.target, login, self.password)
         elif self.args.passWordlist:
             for password in password_list:
-            	password = password.strip()
-            	executor.submit(connectFTP, self.target, self.login, password)
+                password = password.strip()
+                executor.submit(connectFTP, self.target, self.login, password)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
