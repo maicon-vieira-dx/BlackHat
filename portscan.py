@@ -4,6 +4,7 @@ import sys
 import textwrap
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Event
+
 def connect_server(host, port, verbose):
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.settimeout(1)
@@ -14,13 +15,11 @@ def connect_server(host, port, verbose):
         return f"[FECHADA]: {port}"
 
 class PortScanner:
-
     def __init__(self, args):
         self.args = args
         self.target = self.args.target
         self.ports = []
         self.verbose = self.args.verbose
-        self.threads = self.args.threads
         if self.args.range:
             start, end = self.args.range.split('-')
             self.max = int(end)
@@ -37,7 +36,7 @@ class PortScanner:
             count += 1
 
     def scan(self):
-        with ThreadPoolExecutor(max_workers=int(self.threads)) as executor:
+        with ThreadPoolExecutor(max_workers=800) as executor:
             futures = [executor.submit(connect_server, self.target, int(port), self.verbose) for port in self.ports]
 
             try:
@@ -67,7 +66,6 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--list', help='Lista de portas para inspecionar')
     parser.add_argument('-r', '--range', help='Inserir máximo e mínimo de portas para escanear')
     parser.add_argument('-v', '--verbose', action='store_true', help='Visualizar todas as informações')
-    parser.add_argument('-T', '--threads', default=30, help='Quantidade de threads para serem executadas simultaneamente')
     args = parser.parse_args()
     portSc = PortScanner(args)
     portSc.scan()
