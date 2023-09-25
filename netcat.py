@@ -30,10 +30,8 @@ class NetCat:
 
     def run(self):
         if self.args.listen:
-            print("Listen: ", self.args)
             self.listen()
         else:
-            print("Send: ", self.args)
             self.send()
 
     def send(self):
