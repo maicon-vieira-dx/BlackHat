@@ -6,14 +6,13 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 import datetime
 
-# Gerar uma chave privada RSA
 private_key = rsa.generate_private_key(
     public_exponent=65537,
     key_size=2048,
     backend=default_backend()
 )
 
-# Criar um objeto subject para o certificado
+
 subject = x509.Name([
     x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
     x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
@@ -22,7 +21,6 @@ subject = x509.Name([
     x509.NameAttribute(NameOID.COMMON_NAME, "localhost"),
 ])
 
-# Criar um objeto de certificado autoassinado
 cert = x509.CertificateBuilder().subject_name(
     subject
 ).issuer_name(
@@ -39,7 +37,6 @@ cert = x509.CertificateBuilder().subject_name(
     private_key, hashes.SHA256(), default_backend()
 )
 
-# Salvar a chave privada e o certificado em arquivos PEM
 with open("private_key.pem", "wb") as private_key_file:
     private_key_pem = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
