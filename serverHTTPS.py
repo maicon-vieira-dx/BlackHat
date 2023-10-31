@@ -55,8 +55,8 @@ with open("cert.pem", "wb") as cert_file:
     cert_file.write(cert_pem)
 
 # Configurações do servidor
-host = '172.27.0.36'
-port = 8080
+host = '127.0.0.1'
+port = 8000
 certfile = 'cert.pem'  # Certificado SSL autoassinado
 keyfile = 'private_key.pem'  # Chave privada correspondente
 

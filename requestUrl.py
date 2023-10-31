@@ -44,6 +44,7 @@ class RequestHTTP:
             response = fetch_request(self.args.target, self.header, data)
             if response:
                 print(response.decode())
+                print('POST')
 
 
 if __name__ == '__main__':
